@@ -1,6 +1,7 @@
 // TS = tabela de símbolos
+// FALTA IMPLEMENTAR O MÉTODO SEARCH
 
-public class ST_Array<Key extends Comparable<Key>, Item> {
+public class ST_Array<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     /*
     Classe que implementa Tabela de Símbolos por meio de um vetor dinâmico ordenado.
     */
@@ -16,6 +17,7 @@ public class ST_Array<Key extends Comparable<Key>, Item> {
         size = 1;
     }
 
+    @Override
     public void add(Key key, Item val) {
         /*
         Insere, na tabela de símbolos, chave e valor dados como argumentos.
@@ -58,6 +60,7 @@ public class ST_Array<Key extends Comparable<Key>, Item> {
         ++top;
     }
 
+    @Override
     public Item value(Key key) {
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não estiver na TS, retorna null.
@@ -69,6 +72,7 @@ public class ST_Array<Key extends Comparable<Key>, Item> {
         return null;
     }
 
+    @Override
     public int rank(Key key) {
         /*
         Retorna o número de chaves menores do que a chave dada como argumento, por meio da busca binária.
@@ -87,6 +91,7 @@ public class ST_Array<Key extends Comparable<Key>, Item> {
         return baixo;
     }
 
+    @Override
     public Key select(int k) {
         /*
         Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o rank seja maior ou igual à

@@ -1,45 +1,28 @@
-public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
+public class ST_BST<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     /*
     Classe que implementa Tabela de Símbolos por meio de uma Árvore de Busca Binária.
     */
-    private Node raiz;
-
-    private class Node {
-        private Key key;
-        private Item value;
-        private Node direita;
-        private Node esquerda;
-        private Node pai;
-        private int n_nos; // guarda a quantidade de nós em uma (sub-)árvore, contando com a raiz
-
-        private Node(Key key, Item value) {
-            this.key = key;
-            this.value = value;
-            direita = null;
-            esquerda = null;
-            pai = null;
-            n_nos = 1;
-        }
-    }
+    private NodeBST<Key, Item> raiz;
 
     public ST_BST() {
         raiz = null;
     }
 
-    private int size(Node no) {
+    private int size(NodeBST<Key, Item> no) {
         if (no == null) {
             return 0;
         }
         return no.n_nos;
     }
 
-    private Node search(Key key) {
+    @Override
+    public NodeBST<Key, Item> search(Key key) {
         /*
         Busca a chave dada como argumento em uma árvore de busca binária. Se encontrar, retorna o nó.
         Caso contrário, retorna aquele que, se a chave estivesse na árvore, seria seu pai.
         */
-        Node no_atual = raiz;
-        Node anterior = null;
+        NodeBST<Key, Item> no_atual = raiz;
+        NodeBST<Key, Item> anterior = null;
         while (no_atual != null) {
             anterior = no_atual;
             int cmp = key.compareTo(no_atual.key);
@@ -53,7 +36,7 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return anterior; // chega aqui se a chave não existir na árvore
     }
 
-    private void update_N_nos(Node no) {
+    private void update_N_nos(NodeBST<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
         iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
@@ -64,23 +47,24 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
+    @Override
     public void add(Key key, Item val) {
         /*
         Insere, na tabela de símbolos, chave e valor dados como argumentos.
         */
         if (raiz == null) { // TS está vazia
-            raiz = new Node(key, val);
+            raiz = new NodeBST<Key, Item>(key, val);
             return;
         }
-        Node no = search(key); // retorna o próprio nó ou o seu possível pai
+        NodeBST<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai
         int cmp = key.compareTo(no.key);
         if (cmp > 0) {
-            no.direita = new Node(key, val);
+            no.direita = new NodeBST<Key, Item>(key, val);
             no.direita.pai = no;
             update_N_nos(no);
         }
         else if (cmp < 0) {
-            no.esquerda = new Node(key, val);
+            no.esquerda = new NodeBST<Key, Item>(key, val);
             no.esquerda.pai = no;
             update_N_nos(no);
         }
@@ -88,17 +72,19 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             no.value = val;
     }
 
+    @Override
     public Item value(Key key) {
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
         */
-        Node no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        NodeBST<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null)
             if (key.compareTo(no.key) == 0)
                 return no.value;
         return null;
     }
 
+    @Override
     public int rank(Key key) {
         /*
         Retorna o número de chaves menores do que a chave dada como argumento, por meio da busca binária.
@@ -106,7 +92,7 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return rank(raiz, key);
     }
 
-    private int rank(Node no, Key key) {
+    private int rank(NodeBST<Key, Item> no, Key key) {
         /*
         Método auxiliar para que rank possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore binária.
@@ -124,6 +110,7 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             return rank(no.esquerda, key);
     }
 
+    @Override
     public Key select(int k) {
         /*
         Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
@@ -134,7 +121,7 @@ public class ST_BST<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return select(raiz, k);
     }
 
-    private Key select(Node no, int k) {
+    private Key select(NodeBST<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore binária.

@@ -1,10 +1,38 @@
 // REVISAR DESCRIÇÕES DOS MÉTODOS DE TODOS OS ARQUIVOS
-// TERMINAR MAIN: Factory Method Pattern (https://stackoverflow.com/questions/34519878/decide-what-constructor-call-based-on-user-input)
+// CRIAR MÉTODO SEARCH ARRAYS
+// TERMINAR MAIN: Factory Method Pattern (https://www.geeksforgeeks.org/factory-method-design-pattern-in-java/)
+// - adição de elementos na árvore
 
 import java.util.Scanner;
 import java.io.*;
 
 public class EP2_MAC0323 {
+
+    public static ST<String, Integer> createInstance(String type, int n_palavras) {
+        ST<String, Integer> st = null;
+        switch(type) {
+            case "VO":
+                st = new ST_Array<String, Integer>();
+                break;
+            case "ABB":
+                st = new ST_BST<String, Integer>();
+                break;
+            case "TR":
+                st = new ST_Treap<String, Integer>(n_palavras);
+                break;
+            case "A23":
+                st = new ST_23<String, Integer>();
+                break;
+            case "ARN":
+                st = new ST_RB<String, Integer>();
+                break;
+            default:
+                System.out.println("Tipo de Tabela de Símbolos inválida!");
+                System.exit(1);
+            }
+        return st;
+    }
+
     public static void main (String[] args) throws IOException {
         Scanner input_usuarios = new Scanner(System.in); 
         System.out.print("Nome do arquivo de comandos: ");  
@@ -25,18 +53,8 @@ public class EP2_MAC0323 {
             palavra = palavra.replaceAll("[^a-zA-Z ]", ""); // tira pontuação
             palavras[contador++] = palavra;
         }
-        switch (tipo_ST) {
-            case "VO":
-                ST_Array<String, Integer> ts_array = new ST_Array<>();
-            case "ABB":
-                ST_BST<String, Integer> ts_ABB = new ST_BST<>();
-            case "TR":
-                ST_Treap<String, Integer> ts_TR = new ST_Treap<>(n_palavras);
-            case "A23":
-                ST_23<String, Integer> ts_23 = new ST_23<>();
-            case "ARN":
-                ST_RB<String, Integer> ts_RN = new ST_RB<>();
-        }
+
+        ST<String, Integer> ts = createInstance(tipo_ST, n_palavras);
 
         int n_comandos = Integer.parseInt(input_comandos.nextLine());
         int lidas = 0;
@@ -45,23 +63,26 @@ public class EP2_MAC0323 {
             int num_comando = comando.charAt(0) - '0';
             String s = comando.substring(3);
             int k;
+            contador = 0;
             switch (num_comando) {
-                case 1:
+                case 1: // adicionar as próximas k palavras na TS
                     k = Integer.parseInt(s);
-                case 2:
-                    //ts.value(s);
-                case 3:
-                    //ts.rank(s);
-                case 4:
+                    for (int i = 0; i < k; i++) {
+                        String nova_palavra = palavras[contador++];
+                        // ENCONTRAR A RECORRENCIA (criar novo método search, que já retorna a recorrência, se existir, senão, -1)
+                        // ts.add(nova_palavra, recorrencia);
+                    }
+                    break;
+                case 2: // quantas vezes s apareceu no texto até agora
+                    System.out.println(ts.value(s));
+                case 3: // quantas palavras são menores que s na TS
+                    System.out.println(ts.rank(s));
+                case 4: // qual a k-ésima chave da TS
                     k = Integer.parseInt(s);
-                    //ts.select(k);
+                    System.out.println(ts.select(k));
             }
             lidas++;
         }
-
-        // EXIBIR AS SAÍDAS
-        
-
         input_comandos.close();
     }
 }

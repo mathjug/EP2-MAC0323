@@ -1,67 +1,16 @@
-public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
+public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     /*
     Classe que implementa Tabela de Símbolos por meio de uma Árvore 2-3.
     */
-    private Node raiz;
-    
-    private class Node {
-        public Key key1;
-        public Key key2;
-        public Item value1;
-        public Item value2;
-        public boolean eh_2no;
-        public Node direita;
-        public Node esquerda;
-        public Node centro;
-        public Node pai;
-        public int n_nos; // guarda a quantidade de nós em uma (sub-)árvore, contando com a raiz
+    private Node23<Key, Item> raiz;
 
-        private Node(Key key, Item value) { // gera 2-nó
-            this.key1 = key;
-            this.value1 = value;
-            eh_2no = true;
-            direita = null;
-            esquerda = null;
-            centro = null;
-            pai = null;
-            n_nos = 1;
-        }
-
-        private Node(Key key1, Item value1, Key key2, Item value2) { // gera 3-nó
-            this.key1 = key1;
-            this.value1 = value1;
-            this.key2 = key2;
-            this.value2 = value2;
-            eh_2no = false;
-            direita = null;
-            esquerda = null;
-            centro = null;
-            pai = null;
-            n_nos = 2;
-        }
-
-        private Node(Key key1, Item value1, Key key2, Item value2, Node esquerda, Node centro,
-                        Node direita, Node pai, int n_nos) { // gera 3-nó
-            this.key1 = key1;
-            this.value1 = value1;
-            this.key2 = key2;
-            this.value2 = value2;
-            eh_2no = false;
-            this.direita = direita;
-            this.esquerda = esquerda;
-            this.centro = centro;
-            this.pai = pai;
-            this.n_nos = n_nos;
-        }
-    }
-
-    private class FourNode extends Node {
+    private class FourNode extends Node23<Key, Item> {
         private Key key3;
         private Item value3;
-        private Node centro2;
+        private Node23<Key, Item> centro2;
 
-        private FourNode(Key key1, Key key2, Key key3, Item value1, Item value2, Item value3, Node filho1, 
-                        Node filho2, Node filho3, Node filho4, Node pai, int n_nos) {
+        private FourNode(Key key1, Key key2, Key key3, Item value1, Item value2, Item value3, Node23<Key, Item> filho1, 
+                        Node23<Key, Item> filho2, Node23<Key, Item> filho3, Node23<Key, Item> filho4, Node23<Key, Item> pai, int n_nos) {
             super(key1, value1, key2, value2, filho1, filho2, filho4, pai, n_nos);
             this.key3 = key3;
             this.value3 = value3;
@@ -73,14 +22,14 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         raiz = null;
     }
 
-    private int size(Node no) {
+    private int size(Node23<Key, Item> no) {
         if (no == null) {
             return 0;
         }
         return no.n_nos;
     }
 
-    private void update_N_nos(Node no) {
+    private void update_N_nos(Node23<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
         iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
@@ -91,17 +40,18 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
-    private Node search(Key key) {
+    @Override
+    public Node23<Key, Item> search(Key key) {
         /*
         Busca a chave dada como argumento em uma árvore 2-3. Se encontrar, retorna o nó.
         Caso contrário, retorna o nó onde a chave deve ser inserida.
         */
-        Node no_atual = raiz;
-        Node anterior = null;
+        Node23<Key, Item> no_atual = raiz;
+        Node23<Key, Item> anterior = null;
         while (no_atual != null) {
             anterior = no_atual;
             if (no_atual.eh_2no) {
-                int cmp = key.compareTo(no_atual.key1);
+                int cmp = key.compareTo(no_atual.key);
                 if (cmp < 0) // chave a ser inserida é menor do que a chave atual
                     no_atual = no_atual.esquerda;
                 else if (cmp > 0) // chave a ser inserida é maior do que a chave atual
@@ -110,7 +60,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                     return no_atual;
             }
             else { // nó atual é 3-nó
-                int cmp1 = key.compareTo(no_atual.key1);
+                int cmp1 = key.compareTo(no_atual.key);
                 if (cmp1 < 0) // chave a ser inserida é menor do que a primeira chave do nó atual 
                     no_atual = no_atual.esquerda;
                 else if (cmp1 > 0) { // chave a ser inserida é maior do que a primeira
@@ -129,22 +79,22 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return anterior; // chega aqui se a chave não existir na árvore
     }
 
-    private Node add(Node novo, Node velho) {
+    private Node23<Key, Item> add(Node23<Key, Item> novo, Node23<Key, Item> velho) {
         if (novo == null || velho == null)
             return null;
-        Key key = novo.key1;
-        Item val = novo.value1;
-        int cmp1 = key.compareTo(velho.key1);
+        Key key = novo.key;
+        Item val = novo.value;
+        int cmp1 = key.compareTo(velho.key);
         if (velho.eh_2no) { // adicionando em um 2-nó
             if (cmp1 == 0) { // chave a ser inserida já está no nó
-                velho.value1 = val;
+                velho.value = val;
                 return null;
             }
             else if (cmp1 < 0) { // chave a ser inserida é menor do que a que está no nó
-                velho.key2 = velho.key1;
-                velho.value2 = velho.value1;
-                velho.key1 = key;
-                velho.value1 = val;
+                velho.key2 = velho.key;
+                velho.value2 = velho.value;
+                velho.key = key;
+                velho.value = val;
                 velho.eh_2no = false;
                 update_N_nos(velho);
                 return null;
@@ -160,7 +110,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         else { // adicionando em um 3-nó
             int cmp2 = key.compareTo(velho.key2);
             if (cmp1 < 0) { // chave a ser inserida é menor do que as duas
-                FourNode temporario = new FourNode(key, velho.key1, velho.key2, val, velho.value1, velho.value2, 
+                FourNode temporario = new FourNode(key, velho.key, velho.key2, val, velho.value, velho.value2, 
                                                     novo.esquerda, novo.direita, velho.centro, velho.direita, velho.pai, velho.n_nos + 1);
                 if (velho.pai == null) { // inserindo em raiz
                     raiz = split4node(temporario);
@@ -174,12 +124,12 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                     else
                         velho.pai.centro = temporario;
                     // filhos de temporario ainda não têm ele como pai, mas isso muda chamando-se split4node()
-                    Node que_subiu = split4node(temporario);
+                    Node23<Key, Item> que_subiu = split4node(temporario);
                     return add(que_subiu, velho.pai);
                 }                    
             }
             else if (cmp2 > 0) { // chave a ser inserida é maior do que as duas
-                FourNode temporario = new FourNode(velho.key1, velho.key2, key, velho.value1, velho.value2, val,
+                FourNode temporario = new FourNode(velho.key, velho.key2, key, velho.value, velho.value2, val,
                                                     velho.esquerda, velho.centro, novo.esquerda, novo.direita, velho.pai, velho.n_nos + 1);
                 if (velho.pai == null) { // nó é raiz
                     raiz = split4node(temporario);
@@ -192,13 +142,13 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                         velho.pai.direita = temporario;
                     else
                         velho.pai.centro = temporario;
-                    Node que_subiu = split4node(temporario);
+                    Node23<Key, Item> que_subiu = split4node(temporario);
                     return add(que_subiu, velho.pai);
                 }        
             }
             else { // chave a ser inserida está entre as duas ou é igual a alguma
                 if (cmp1 == 0) { // chave a ser inserida é igual à primeira
-                    velho.value1 = val;
+                    velho.value = val;
                     return null;
                 }
                 else if (cmp2 == 0) { // chave a ser inserida é igual à segunda
@@ -206,7 +156,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                     return null;
                 }
                 else { // chave a ser inserida está entre as duas
-                    FourNode temporario = new FourNode(velho.key1, key, velho.key2, velho.value1, val, velho.value2,
+                    FourNode temporario = new FourNode(velho.key, key, velho.key2, velho.value, val, velho.value2,
                                                     velho.esquerda, novo.esquerda, novo.direita, velho.direita, velho.pai, velho.n_nos + 1);
                     if (velho.pai == null) { // nó é raiz
                         raiz = split4node(temporario); // o nó retornado por split4node() tem pai == null
@@ -219,7 +169,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                             velho.pai.direita = temporario;
                         else
                             velho.pai.centro = temporario;
-                        Node que_subiu = split4node(temporario);
+                        Node23<Key, Item> que_subiu = split4node(temporario);
                         return add(que_subiu, velho.pai);
                     }   
                 }
@@ -228,13 +178,13 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
-    private Node split4node(FourNode no) {
+    private Node23<Key, Item> split4node(FourNode no) {
         if (no == null)
             return null;
         
-        Node menor = new Node(no.key1, no.value1);
-        Node meio = new Node(no.key2, no.value2);
-        Node maior = new Node(no.key3, no.value3);
+        Node23<Key, Item> menor = new Node23<Key, Item>(no.key, no.value);
+        Node23<Key, Item> meio = new Node23<Key, Item>(no.key2, no.value2);
+        Node23<Key, Item> maior = new Node23<Key, Item>(no.key3, no.value3);
         menor.n_nos = size(no.esquerda) + size(no.centro) + 1;
         maior.n_nos = size(no.centro2) + size(no.direita) + 1;
         meio.n_nos = size(menor) + size(maior) + 1;
@@ -267,28 +217,30 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return meio;
     }
 
+    @Override
     public void add(Key key, Item val) {
         /*
         Insere, na árvore 2-3, chave e valor dados como argumentos.
         */
-        Node novo = new Node(key, val);
+        Node23<Key, Item> novo = new Node23<Key, Item>(key, val);
         if (raiz == null) { // árvore está vazia
             raiz = novo;
             return;
         }
-        Node velho = search(key); // retorna nó onde já está a chave ou onde ela deve ser inserida
+        Node23<Key, Item> velho = search(key); // retorna nó onde já está a chave ou onde ela deve ser inserida
         add(novo, velho);
     }
 
+    @Override
     public Item value(Key key) {
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
         */
-        Node no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        Node23<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null) {
-            int cmp1 = key.compareTo(no.key1);
+            int cmp1 = key.compareTo(no.key);
             if (cmp1 == 0)
-                return no.value1;
+                return no.value;
             if (!no.eh_2no)
                 if (key.compareTo(no.key2) == 0)
                     return no.value2;
@@ -296,6 +248,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return null;
     }
 
+    @Override
     public int rank(Key key) {
         /*
         Retorna o número de chaves menores do que a chave dada como argumento.
@@ -303,7 +256,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return rank(raiz, key);
     }
 
-    private int rank(Node no, Key key) {
+    private int rank(Node23<Key, Item> no, Key key) {
         /*
         Método auxiliar para que rank possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore 2-3.
@@ -311,7 +264,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         if (no == null)
             return 0;
         if (no.eh_2no) {
-            int cmp = key.compareTo(no.key1);
+            int cmp = key.compareTo(no.key);
             if (cmp < 0)
                 return rank(no.esquerda, key);
             else if (cmp > 0)
@@ -320,7 +273,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                 return size(no.esquerda);
         }
         else { // nó é 3-nó
-            int cmp1 = key.compareTo(no.key1);
+            int cmp1 = key.compareTo(no.key);
             int cmp2 = key.compareTo(no.key2);
             if (cmp1 < 0) // chave é menor do que ambas as chaves do nó atual
                 return rank(no.esquerda, key);
@@ -337,6 +290,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
+    @Override
     public Key select(int k) {
         /*
         Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
@@ -347,7 +301,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return select(raiz, k);
     }
 
-    private Key select(Node no, int k) {
+    private Key select(Node23<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore binária.
@@ -355,7 +309,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         int tam_esquerda = size(no.esquerda);
         if (no.eh_2no) {
             if (tam_esquerda == k)
-                return no.key1;
+                return no.key;
             else if (tam_esquerda > k)
                 return select(no.esquerda, k);
             else
@@ -366,7 +320,7 @@ public class ST_23<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             if (k < tam_esquerda)
                 return select(no.esquerda, k);
             else if (k == tam_esquerda)
-                return no.key1;
+                return no.key;
             else if (k < tam_esquerda + tam_centro + 1)
                 return select(no.centro, k - tam_esquerda - 1);
             else if (k == tam_esquerda + tam_centro + 1)

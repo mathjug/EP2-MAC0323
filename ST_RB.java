@@ -1,41 +1,21 @@
-public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
+public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     /*
     Classe que implementa Tabela de Símbolos por meio de uma Árvore Rubro Negra.
     */
-    private Node raiz;
-
-    private class Node {
-        private Key key;
-        private Item value;
-        private boolean eh_vermelho;
-        private Node direita;
-        private Node esquerda;
-        private Node pai;
-        private int n_nos; // guarda a quantidade de nós em uma (sub-)árvore, contando com a raiz
-
-        private Node(Key key, Item value) {
-            this.key = key;
-            this.value = value;
-            eh_vermelho = true;
-            direita = null;
-            esquerda = null;
-            pai = null;
-            n_nos = 1;
-        }
-    }
+    private NodeRB<Key, Item> raiz;
 
     public ST_RB() {
         raiz = null;
     }
 
-    private int size(Node no) {
+    private int size(NodeRB<Key, Item> no) {
         if (no == null) {
             return 0;
         }
         return no.n_nos;
     }
 
-    private void mudaCor(Node no) {
+    private void mudaCor(NodeRB<Key, Item> no) {
         if (no.eh_vermelho) {
             no.eh_vermelho = false;
             return;
@@ -43,13 +23,14 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         no.eh_vermelho = true;
     }
 
-    private Node search(Key key) {
+    @Override
+    public NodeRB<Key, Item> search(Key key) {
         /*
         Busca a chave dada como argumento em uma árvore rubro-negra. Se encontrar, retorna o nó.
         Caso contrário, retorna aquele que, se a chave estivesse na árvore, seria seu pai.
         */
-        Node no_atual = raiz;
-        Node anterior = null;
+        NodeRB<Key, Item> no_atual = raiz;
+        NodeRB<Key, Item> anterior = null;
         while (no_atual != null) {
             anterior = no_atual;
             int cmp = key.compareTo(no_atual.key);
@@ -63,7 +44,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return anterior; // chega aqui se a chave não existir na árvore
     }
 
-    private void update_N_nos(Node no) {
+    private void update_N_nos(NodeRB<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
         iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
@@ -74,11 +55,11 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
-    private void rodaEsq(Node no) {
+    private void rodaEsq(NodeRB<Key, Item> no) {
         /*
         Dado um nó, faz o movimento de rotacioná-lo para a esquerda. Deve mudar os ponteiros e n_nos.
         */
-        Node d = no.direita;
+        NodeRB<Key, Item> d = no.direita;
         if (d != null) {
             d.n_nos = no.n_nos;
             if (d.direita != null)
@@ -102,11 +83,11 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
-    private void rodaDir(Node no) {
+    private void rodaDir(NodeRB<Key, Item> no) {
         /*
         Dado um nó, faz o movimento de rotacioná-lo para a direita. Deve mudar os ponteiros e n_nos.
         */
-        Node e = no.esquerda;
+        NodeRB<Key, Item> e = no.esquerda;
         if (e != null) {
             e.n_nos = no.n_nos;
             if (e.esquerda != null)
@@ -130,26 +111,26 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         }
     }
 
-    private Node addBST(Key key, Item val) {
+    private NodeRB<Key, Item> addBST(Key key, Item val) {
         /*
         Insere, na tabela de símbolos, chave e valor dados como argumentos, pelo método de inserção
         em Árvores de Busca Binária. Colore o elemento inserido de vermelho. Retorna esse elemento
         (como nó).
         */
         if (raiz == null) { // TS está vazia
-            raiz = new Node(key, val);
+            raiz = new NodeRB<Key, Item>(key, val);
             return raiz;
         }
-        Node no = search(key); // retorna o próprio nó ou o seu possível pai
+        NodeRB<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai
         int cmp = key.compareTo(no.key);
         if (cmp > 0) {
-            no.direita = new Node(key, val);
+            no.direita = new NodeRB<Key, Item>(key, val);
             no.direita.pai = no;
             update_N_nos(no);
             return no.direita;
         }
         else if (cmp < 0) {
-            no.esquerda = new Node(key, val);
+            no.esquerda = new NodeRB<Key, Item>(key, val);
             no.esquerda.pai = no;
             update_N_nos(no);
             return no.esquerda;
@@ -159,13 +140,14 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             return no;
     }
 
+    @Override
     public void add(Key key, Item val) {
-        Node no = addBST(key, val);
+        NodeRB<Key, Item> no = addBST(key, val);
         while (no != null && no.pai != null && no.pai.eh_vermelho) { // enquanto não alcançar a raiz e o pai for vermelho
-            Node pai = no.pai; // não é necessário se preocupar com o pai ser raiz, pois, se fosse, seria preto
-            Node avo = no.pai.pai; // é preto, pois pelo menos um de seus filhos é vermelho
+            NodeRB<Key, Item> pai = no.pai; // não é necessário se preocupar com o pai ser raiz, pois, se fosse, seria preto
+            NodeRB<Key, Item> avo = no.pai.pai; // é preto, pois pelo menos um de seus filhos é vermelho
             if (pai == avo.direita) { // pai está à direita do avô
-                Node tio = avo.esquerda;
+                NodeRB<Key, Item> tio = avo.esquerda;
                 if (tio != null && tio.eh_vermelho) { // tio vermelho
                     mudaCor(pai); mudaCor(avo); mudaCor(tio);
                 }
@@ -180,7 +162,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
                 }
             }
             else { // pai está à esquerda do avô
-                Node tio = avo.direita;
+                NodeRB<Key, Item> tio = avo.direita;
                 if (tio != null && tio.eh_vermelho) {
                     mudaCor(pai); mudaCor(avo); mudaCor(tio);
                 }
@@ -200,17 +182,19 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             no.eh_vermelho = false; // se chegou aqui, o nó analisado é raiz
     }
 
+    @Override
     public Item value(Key key) {
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
         */
-        Node no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        NodeRB<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null)
             if (key.compareTo(no.key) == 0)
                 return no.value;
         return null;
     }
 
+    @Override
     public int rank(Key key) {
         /*
         Retorna o número de chaves menores do que a chave dada como argumento, por meio da busca binária.
@@ -218,7 +202,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return rank(raiz, key);
     }
 
-    private int rank(Node no, Key key) {
+    private int rank(NodeRB<Key, Item> no, Key key) {
         /*
         Método auxiliar para que rank possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore rubro-negra.
@@ -236,6 +220,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
             return rank(no.esquerda, key);
     }
 
+    @Override
     public Key select(int k) {
         /*
         Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
@@ -246,7 +231,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> extends ST<Key, Item> {
         return select(raiz, k);
     }
 
-    private Key select(Node no, int k) {
+    private Key select(NodeRB<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
         árvore binária.
