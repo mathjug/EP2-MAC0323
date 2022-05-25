@@ -1,6 +1,9 @@
 import java.util.*; // para utilizar a biblioteca Random
 
 public class NodeTreap<Key extends Comparable<Key>, Item> extends Node<Key, Item> {
+    /*
+    Classe que implementa um nó de uma Treap.
+    */
     public int prioridade;
     public NodeTreap<Key, Item> direita;
     public NodeTreap<Key, Item> esquerda;

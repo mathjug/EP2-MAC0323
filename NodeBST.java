@@ -1,4 +1,7 @@
 public class NodeBST<Key extends Comparable<Key>, Item> extends Node<Key, Item> {
+    /*
+    Classe que implementa um nó de uma Árvore de Busca Binária.
+    */
     public NodeBST<Key, Item> direita;
     public NodeBST<Key, Item> esquerda;
     public NodeBST<Key, Item> pai;

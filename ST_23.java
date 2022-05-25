@@ -5,6 +5,9 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     private Node23<Key, Item> raiz;
 
     private class FourNode extends Node23<Key, Item> {
+        /*
+        Classe que abstrai o conceito de um 4-nó, o qual contém 3 pares chave-valor e 4 filhos.
+        */
         private Key key3;
         private Item value3;
         private Node23<Key, Item> centro2;
@@ -32,7 +35,7 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     private void update_N_nos(Node23<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
-        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
+        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal.
         */
         while (no != null) {
             no.n_nos++;
@@ -40,8 +43,7 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         }
     }
 
-    @Override
-    public Node23<Key, Item> search(Key key) {
+    private Node23<Key, Item> search23(Key key) {
         /*
         Busca a chave dada como argumento em uma árvore 2-3. Se encontrar, retorna o nó.
         Caso contrário, retorna o nó onde a chave deve ser inserida.
@@ -79,106 +81,11 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         return anterior; // chega aqui se a chave não existir na árvore
     }
 
-    private Node23<Key, Item> add(Node23<Key, Item> novo, Node23<Key, Item> velho) {
-        if (novo == null || velho == null)
-            return null;
-        Key key = novo.key;
-        Item val = novo.value;
-        int cmp1 = key.compareTo(velho.key);
-        if (velho.eh_2no) { // adicionando em um 2-nó
-            if (cmp1 == 0) { // chave a ser inserida já está no nó
-                velho.value = val;
-                return null;
-            }
-            else if (cmp1 < 0) { // chave a ser inserida é menor do que a que está no nó
-                velho.key2 = velho.key;
-                velho.value2 = velho.value;
-                velho.key = key;
-                velho.value = val;
-                velho.eh_2no = false;
-                update_N_nos(velho);
-                return null;
-            }
-            else { // chave a ser inserida é maior do que a que está no nó
-                velho.key2 = key;
-                velho.value2 = val;
-                velho.eh_2no = false;
-                update_N_nos(velho);
-                return null;
-            }
-        }
-        else { // adicionando em um 3-nó
-            int cmp2 = key.compareTo(velho.key2);
-            if (cmp1 < 0) { // chave a ser inserida é menor do que as duas
-                FourNode temporario = new FourNode(key, velho.key, velho.key2, val, velho.value, velho.value2, 
-                                                    novo.esquerda, novo.direita, velho.centro, velho.direita, velho.pai, velho.n_nos + 1);
-                if (velho.pai == null) { // inserindo em raiz
-                    raiz = split4node(temporario);
-                    return null;
-                }
-                else { // não está inserindo na raiz
-                    if (velho == velho.pai.esquerda)
-                        velho.pai.esquerda = temporario;
-                    else if (velho == velho.pai.direita)
-                        velho.pai.direita = temporario;
-                    else
-                        velho.pai.centro = temporario;
-                    // filhos de temporario ainda não têm ele como pai, mas isso muda chamando-se split4node()
-                    Node23<Key, Item> que_subiu = split4node(temporario);
-                    return add(que_subiu, velho.pai);
-                }                    
-            }
-            else if (cmp2 > 0) { // chave a ser inserida é maior do que as duas
-                FourNode temporario = new FourNode(velho.key, velho.key2, key, velho.value, velho.value2, val,
-                                                    velho.esquerda, velho.centro, novo.esquerda, novo.direita, velho.pai, velho.n_nos + 1);
-                if (velho.pai == null) { // nó é raiz
-                    raiz = split4node(temporario);
-                    return null;
-                }
-                else { // nó não é raiz
-                    if (velho == velho.pai.esquerda)
-                            velho.pai.esquerda = temporario;
-                    else if (velho == velho.pai.direita)
-                        velho.pai.direita = temporario;
-                    else
-                        velho.pai.centro = temporario;
-                    Node23<Key, Item> que_subiu = split4node(temporario);
-                    return add(que_subiu, velho.pai);
-                }        
-            }
-            else { // chave a ser inserida está entre as duas ou é igual a alguma
-                if (cmp1 == 0) { // chave a ser inserida é igual à primeira
-                    velho.value = val;
-                    return null;
-                }
-                else if (cmp2 == 0) { // chave a ser inserida é igual à segunda
-                    velho.value2 = val;
-                    return null;
-                }
-                else { // chave a ser inserida está entre as duas
-                    FourNode temporario = new FourNode(velho.key, key, velho.key2, velho.value, val, velho.value2,
-                                                    velho.esquerda, novo.esquerda, novo.direita, velho.direita, velho.pai, velho.n_nos + 1);
-                    if (velho.pai == null) { // nó é raiz
-                        raiz = split4node(temporario); // o nó retornado por split4node() tem pai == null
-                        return null;
-                    }
-                    else { // nó não é raiz
-                        if (velho == velho.pai.esquerda)
-                            velho.pai.esquerda = temporario;
-                        else if (velho == velho.pai.direita)
-                            velho.pai.direita = temporario;
-                        else
-                            velho.pai.centro = temporario;
-                        Node23<Key, Item> que_subiu = split4node(temporario);
-                        return add(que_subiu, velho.pai);
-                    }   
-                }
-            }
-            
-        }
-    }
-
     private Node23<Key, Item> split4node(FourNode no) {
+        /*
+        Dado um 4-nó temporário, executa o processo de fragmentação dele em três 2-nós. Retorna o
+        nó de chave intermediária.
+        */
         if (no == null)
             return null;
         
@@ -217,6 +124,125 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         return meio;
     }
 
+    private void add(Node23<Key, Item> novo, Node23<Key, Item> velho) {
+        /*
+        Método privativo auxiliar para inserção na árvore 2-3. Atua de maneira recursiva, até que a
+        inserção seja concluida com êxito e todas as chaves sejam posicionadas corretamente.
+        */
+        if (novo == null || velho == null)
+            return;
+        Key key = novo.key;
+        Item val = novo.value;
+        int cmp1 = key.compareTo(velho.key);
+        if (velho.eh_2no) { // adicionando em um 2-nó
+            if (cmp1 == 0) { // chave a ser inserida já está no nó
+                velho.value = val;
+                return;
+            }
+            else if (cmp1 < 0) { // chave a ser inserida é menor do que a que está no nó
+                velho.key2 = velho.key;
+                velho.value2 = velho.value;
+                velho.key = key;
+                velho.value = val;
+                velho.eh_2no = false;
+                update_N_nos(velho);
+                return;
+            }
+            else { // chave a ser inserida é maior do que a que está no nó
+                velho.key2 = key;
+                velho.value2 = val;
+                velho.eh_2no = false;
+                update_N_nos(velho);
+                return;
+            }
+        }
+        else { // adicionando em um 3-nó
+            int cmp2 = key.compareTo(velho.key2);
+            if (cmp1 < 0) { // chave a ser inserida é menor do que as duas
+                FourNode temporario = new FourNode(key, velho.key, velho.key2, val, velho.value, velho.value2, 
+                                                    novo.esquerda, novo.direita, velho.centro, velho.direita, velho.pai, velho.n_nos + 1);
+                if (velho.pai == null) { // inserindo em raiz
+                    raiz = split4node(temporario);
+                    return;
+                }
+                else { // não está inserindo na raiz
+                    if (velho == velho.pai.esquerda)
+                        velho.pai.esquerda = temporario;
+                    else if (velho == velho.pai.direita)
+                        velho.pai.direita = temporario;
+                    else
+                        velho.pai.centro = temporario;
+                    // filhos de temporario ainda não têm ele como pai, mas isso muda chamando-se split4node()
+                    Node23<Key, Item> que_subiu = split4node(temporario);
+                    add(que_subiu, velho.pai);
+                }                    
+            }
+            else if (cmp2 > 0) { // chave a ser inserida é maior do que as duas
+                FourNode temporario = new FourNode(velho.key, velho.key2, key, velho.value, velho.value2, val,
+                                                    velho.esquerda, velho.centro, novo.esquerda, novo.direita, velho.pai, velho.n_nos + 1);
+                if (velho.pai == null) { // nó é raiz
+                    raiz = split4node(temporario);
+                    return;
+                }
+                else { // nó não é raiz
+                    if (velho == velho.pai.esquerda)
+                            velho.pai.esquerda = temporario;
+                    else if (velho == velho.pai.direita)
+                        velho.pai.direita = temporario;
+                    else
+                        velho.pai.centro = temporario;
+                    Node23<Key, Item> que_subiu = split4node(temporario);
+                    add(que_subiu, velho.pai);
+                }        
+            }
+            else { // chave a ser inserida está entre as duas ou é igual a alguma
+                if (cmp1 == 0) { // chave a ser inserida é igual à primeira
+                    velho.value = val;
+                    return;
+                }
+                else if (cmp2 == 0) { // chave a ser inserida é igual à segunda
+                    velho.value2 = val;
+                    return;
+                }
+                else { // chave a ser inserida está entre as duas
+                    FourNode temporario = new FourNode(velho.key, key, velho.key2, velho.value, val, velho.value2,
+                                                    velho.esquerda, novo.esquerda, novo.direita, velho.direita, velho.pai, velho.n_nos + 1);
+                    if (velho.pai == null) { // nó é raiz
+                        raiz = split4node(temporario); // o nó retornado por split4node() tem pai == null
+                        return;
+                    }
+                    else { // nó não é raiz
+                        if (velho == velho.pai.esquerda)
+                            velho.pai.esquerda = temporario;
+                        else if (velho == velho.pai.direita)
+                            velho.pai.direita = temporario;
+                        else
+                            velho.pai.centro = temporario;
+                        Node23<Key, Item> que_subiu = split4node(temporario);
+                        add(que_subiu, velho.pai);
+                    }   
+                }
+            }
+            
+        }
+    }
+
+    @Override
+    public Item search(Key key) {
+        /*
+        Busca a chave dada como argumento na Árvore 2-3. Se encontrar, retorna o seu valor.
+        Caso contrário, retorna null.
+        */
+        Node23<Key, Item> no = search23(key);
+        if (no != null) {
+            if (key.equals(no.key))
+                return no.value;
+            if (key.equals(no.key2))
+                return no.value2;
+        }
+        return null;
+    }
+
     @Override
     public void add(Key key, Item val) {
         /*
@@ -227,16 +253,16 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
             raiz = novo;
             return;
         }
-        Node23<Key, Item> velho = search(key); // retorna nó onde já está a chave ou onde ela deve ser inserida
+        Node23<Key, Item> velho = search23(key); // retorna nó onde já está a chave ou onde ela deve ser inserida
         add(novo, velho);
     }
 
     @Override
     public Item value(Key key) {
         /*
-        Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
+        Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore 2-3, retorna null.
         */
-        Node23<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        Node23<Key, Item> no = search23(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null) {
             int cmp1 = key.compareTo(no.key);
             if (cmp1 == 0)
@@ -251,7 +277,7 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     @Override
     public int rank(Key key) {
         /*
-        Retorna o número de chaves menores do que a chave dada como argumento.
+        Retorna o número de chaves na árvore 2-3 menores do que a chave dada como argumento.
         */
         return rank(raiz, key);
     }
@@ -293,8 +319,8 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     @Override
     public Key select(int k) {
         /*
-        Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
-        a quantidade de nós na árvore, retorna null.
+        Dado um valor de rank, retorna a sua chave. Caso o valor do rank supere a quantidade de nós
+        na árvore, retorna null.
         */
         if (k >= raiz.n_nos || k < 0)
             return null;
@@ -304,7 +330,7 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     private Key select(Node23<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
-        árvore binária.
+        árvore 2-3.
         */
         int tam_esquerda = size(no.esquerda);
         if (no.eh_2no) {

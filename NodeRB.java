@@ -1,4 +1,7 @@
 public class NodeRB<Key extends Comparable<Key>, Item> extends Node<Key, Item> {
+    /*
+    Classe que implementa um nó de uma Árvore Rubro Negra.
+    */
     public boolean eh_vermelho;
     public NodeRB<Key, Item> direita;
     public NodeRB<Key, Item> esquerda;

@@ -16,6 +16,9 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     }
 
     private void mudaCor(NodeRB<Key, Item> no) {
+        /*
+        Dado um nó, altera a sua cor.
+        */
         if (no.eh_vermelho) {
             no.eh_vermelho = false;
             return;
@@ -23,8 +26,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         no.eh_vermelho = true;
     }
 
-    @Override
-    public NodeRB<Key, Item> search(Key key) {
+    private NodeRB<Key, Item> searchRB(Key key) {
         /*
         Busca a chave dada como argumento em uma árvore rubro-negra. Se encontrar, retorna o nó.
         Caso contrário, retorna aquele que, se a chave estivesse na árvore, seria seu pai.
@@ -47,7 +49,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     private void update_N_nos(NodeRB<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
-        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
+        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal.
         */
         while (no != null) {
             no.n_nos++;
@@ -113,7 +115,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
 
     private NodeRB<Key, Item> addBST(Key key, Item val) {
         /*
-        Insere, na tabela de símbolos, chave e valor dados como argumentos, pelo método de inserção
+        Insere, na árvore rubro negra, chave e valor dados como argumentos, pelo método de inserção
         em Árvores de Busca Binária. Colore o elemento inserido de vermelho. Retorna esse elemento
         (como nó).
         */
@@ -121,7 +123,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
             raiz = new NodeRB<Key, Item>(key, val);
             return raiz;
         }
-        NodeRB<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai
+        NodeRB<Key, Item> no = searchRB(key); // retorna o próprio nó ou o seu possível pai
         int cmp = key.compareTo(no.key);
         if (cmp > 0) {
             no.direita = new NodeRB<Key, Item>(key, val);
@@ -141,7 +143,22 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     }
 
     @Override
+    public Item search(Key key) {
+        /*
+        Busca, na Árvore Rubro Negra, a chave dada como argumento. Se encontrar, retorna o seu valor.
+        Caso contrário, retorna null.
+        */
+        NodeRB<Key, Item> no = searchRB(key);
+        if (no != null && key.equals(no.key))
+            return no.value;
+        return null;
+    }
+
+    @Override
     public void add(Key key, Item val) {
+        /*
+        Insere, na árvore rubro negra, chave e valor dados como argumentos.
+        */
         NodeRB<Key, Item> no = addBST(key, val);
         while (no != null && no.pai != null && no.pai.eh_vermelho) { // enquanto não alcançar a raiz e o pai for vermelho
             NodeRB<Key, Item> pai = no.pai; // não é necessário se preocupar com o pai ser raiz, pois, se fosse, seria preto
@@ -187,7 +204,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
         */
-        NodeRB<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        NodeRB<Key, Item> no = searchRB(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null)
             if (key.compareTo(no.key) == 0)
                 return no.value;
@@ -197,7 +214,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     @Override
     public int rank(Key key) {
         /*
-        Retorna o número de chaves menores do que a chave dada como argumento, por meio da busca binária.
+        Retorna o número de chaves menores do que a chave dada como argumento.
         */
         return rank(raiz, key);
     }
@@ -223,8 +240,8 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     @Override
     public Key select(int k) {
         /*
-        Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
-        a quantidade de nós na árvore, retorna null.
+        Dado o valor do rank de um elemento da árvore rubro negra, retorna a sua chave. Caso o valor do
+        rank supere a quantidade de nós na árvore, retorna null.
         */
         if (k >= size(raiz) || k < 0)
             return null;
@@ -234,7 +251,7 @@ public class ST_RB<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     private Key select(NodeRB<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
-        árvore binária.
+        árvore rubro negra.
         */
         if (no == null)
             return null;

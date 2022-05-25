@@ -1,7 +1,7 @@
 public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
     /*
     Classe que implementa Tabela de Símbolos por meio de uma Treap. Os seus métodos value, rank e select
-    são os mesmos de uma implementação que utiliza Árvores Binárias de Busca não aleatorizadas.
+    são os mesmos de uma implementação que utiliza Árvores de Busca Binária não aleatorizadas.
     */
     private NodeTreap<Key, Item> raiz;
     private int n_palavras;
@@ -18,11 +18,10 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
         return no.n_nos;
     }
 
-    @Override
-    public NodeTreap<Key, Item> search(Key key) {
+    private NodeTreap<Key, Item> searchTR(Key key) {
         /*
-        Busca a chave dada como argumento em uma árvore de busca binária. Se encontrar, retorna o nó.
-        Caso contrário, retorna aquele que, se a chave estivesse na árvore, seria seu pai.
+        Busca, na Treap, a chave dada como argumento. Se encontrar, retorna o nó. Caso contrário,
+        retorna aquele que, se a chave estivesse na árvore, seria seu pai.
         */
         NodeTreap<Key, Item> no_atual = raiz;
         NodeTreap<Key, Item> anterior = null;
@@ -42,7 +41,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     private void update_N_nos(NodeTreap<Key, Item> no) {
         /*
         Recebido um nó, incrementa em 1 a quantidade de nós na sub-árvore enraizada nele. Faz isso
-        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal
+        iterativamente, para todos acima e no caminho desse nó, até a raiz da árvore principal.
         */
         while (no != null) {
             no.n_nos++;
@@ -110,14 +109,14 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
 
     private NodeTreap<Key, Item> addBST(Key key, Item val) {
         /*
-        Insere, na tabela de símbolos, chave e valor dados como argumentos, pelo método de inserção
-        em Árvores de Busca Binária. Retorna esse elemento (como nó).
+        Executa o método de inserção, em uma árvore de busca binária, de chave e valor dados como argumentos.
+        Retorna esse elemento (como nó).
         */
         if (raiz == null) { // TS está vazia
             raiz = new NodeTreap<Key, Item>(key, val, n_palavras);
             return raiz;
         }
-        NodeTreap<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai
+        NodeTreap<Key, Item> no = searchTR(key); // retorna o próprio nó ou o seu possível pai
         int cmp = key.compareTo(no.key);
         if (cmp > 0) {
             no.direita = new NodeTreap<Key, Item>(key, val, n_palavras);
@@ -137,9 +136,21 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     }
 
     @Override
+    public Item search(Key key) {
+        /*
+        Busca a chave dada como argumento na Treap. Se encontrar, retorna o seu valor.
+        Caso contrário, retorna null.
+        */
+        NodeTreap<Key, Item> no = searchTR(key);
+        if (no != null && key.equals(no.key))
+            return no.value;
+        return null;
+    }
+
+    @Override
     public void add(Key key, Item val) {
         /*
-        Insere, na tabela de símbolos, chave e valor dados como argumentos.
+        Insere, na Treap, chave e valor dados como argumentos.
         */
         NodeTreap<Key, Item> atual = addBST(key, val);
         while (atual != null && atual.pai != null) {
@@ -157,7 +168,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não existir na árvore, retorna null.
         */
-        NodeTreap<Key, Item> no = search(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
+        NodeTreap<Key, Item> no = searchTR(key); // retorna o próprio nó ou o seu possível pai (que pode ser null)
         if (no != null)
             if (key.compareTo(no.key) == 0)
                 return no.value;
@@ -167,7 +178,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     @Override
     public int rank(Key key) {
         /*
-        Retorna o número de chaves menores do que a chave dada como argumento, por meio da busca binária.
+        Retorna o número de chaves menores do que a chave dada como argumento.
         */
         return rank(raiz, key);
     }
@@ -175,7 +186,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     private int rank(NodeTreap<Key, Item> no, Key key) {
         /*
         Método auxiliar para que rank possa fazer chamadas recursivas, tendo como raiz outros nós da
-        árvore binária.
+        Treap.
         */
         if (no == null)
             return 0;
@@ -193,7 +204,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     @Override
     public Key select(int k) {
         /*
-        Dado o valor do rank de um elemento da TS, retorna a sua chave. Caso o valor do rank supere
+        Dado o valor do rank de um elemento da Treap, retorna a sua chave. Caso o valor do rank supere
         a quantidade de nós na árvore, retorna null.
         */
         if (k >= size(raiz) || k < 0)
@@ -204,7 +215,7 @@ public class ST_Treap<Key extends Comparable<Key>, Item> implements ST<Key, Item
     private Key select(NodeTreap<Key, Item> no, int k) {
         /*
         Método auxiliar para que select possa fazer chamadas recursivas, tendo como raiz outros nós da
-        árvore binária.
+        Treap.
         */
         if (no == null)
             return null;
