@@ -145,6 +145,11 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
                 velho.key = key;
                 velho.value = val;
                 velho.eh_2no = false;
+                if (novo.esquerda != null) {
+                    velho.direita = velho.esquerda;
+                    velho.esquerda = novo.esquerda;
+                    velho.centro = novo.direita;
+                }
                 update_N_nos(velho);
                 return;
             }
@@ -152,6 +157,10 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
                 velho.key2 = key;
                 velho.value2 = val;
                 velho.eh_2no = false;
+                if (novo.esquerda != null) {
+                    velho.centro = novo.esquerda;
+                    velho.direita = novo.direita;
+                }
                 update_N_nos(velho);
                 return;
             }

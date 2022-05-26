@@ -86,10 +86,13 @@ public class ST_Array<Key extends Comparable<Key>, Item> implements ST<Key, Item
         /*
         Dada uma chave, retorna o valor correspondente a ela. Se ela não estiver no array ordenado, retorna null.
         */
-        Item item = items[rank(key)];
-        Key chave = keys[rank(key)];
-        if (key.compareTo(chave) == 0)
-            return item;
+        int rank = rank(key);
+        if (rank <= top) {
+            Item item = items[rank(key)];
+            Key chave = keys[rank(key)];
+            if (key.compareTo(chave) == 0)
+                return item;
+        }
         return null;
     }
 
