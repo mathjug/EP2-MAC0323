@@ -53,8 +53,9 @@ public class EP2_MAC0323 {
         int contador = 0;
         while (contador < n_palavras) { // guarda todas as palavras do texto em um array
             String palavra = input_comandos.next(); // recebe a próxima palavra
-            palavra = palavra.replaceAll("[^a-zA-Z ]", ""); // tira pontuação
-            palavras[contador++] = palavra;
+            palavra = palavra.replaceAll("[^a-zA-Z0-9 ]", ""); // tira pontuação
+            if (palavra != "" && palavra != "\n")
+                palavras[contador++] = palavra;
         }
 
         ST<String, Integer> ts = createInstance(tipo_ST, n_palavras);
@@ -64,12 +65,13 @@ public class EP2_MAC0323 {
         int lidas = 0;
         contador = 0;
 
-        long start = System.currentTimeMillis();
         while (lidas < n_comandos) { // lê todos os comandos
             String comando = input_comandos.nextLine();
             int num_comando = comando.charAt(0) - '0'; // guarda o número do comando
             String s = comando.substring(2); // guarda o complemento do comando
             int k;
+            long start, end, tempo_execucao;
+            start = System.nanoTime();
             switch (num_comando) {
                 case 1: // adicionar as próximas k palavras na TS
                     k = Integer.parseInt(s);
@@ -80,23 +82,35 @@ public class EP2_MAC0323 {
                             recorrencia = 0;
                         ts.add(nova_palavra, recorrencia + 1);
                     }
+                    end = System.nanoTime();
+                    tempo_execucao = end - start;
+                    System.out.printf("\nTempo da operação add: %d nanossegundos.\n\n", tempo_execucao);
                     break;
                 case 2: // quantas vezes s apareceu no texto até agora
-                    System.out.println(ts.value(s));
+                    Integer valor = ts.value(s);
+                    if (valor == null)
+                        valor = 0;
+                    System.out.println(valor);
+                    end = System.nanoTime();
+                    tempo_execucao = end - start;
+                    System.out.printf("Tempo da operação value: %d nanossegundos.\n\n", tempo_execucao);
                     break;
                 case 3: // quantas palavras são menores que s na TS
                     System.out.println(ts.rank(s));
+                    end = System.nanoTime();
+                    tempo_execucao = end - start;
+                    System.out.printf("Tempo da operação rank: %d nanossegundos.\n\n", tempo_execucao);
                     break;
                 case 4: // qual a k-ésima chave da TS
                     k = Integer.parseInt(s);
                     System.out.println(ts.select(k));
+                    end = System.nanoTime();
+                    tempo_execucao = end - start;
+                    System.out.printf("Tempo da operação select: %d nanossegundos.\n\n", tempo_execucao);
                     break;
             }
             lidas++;
         }
-        long end = System.currentTimeMillis();
         input_comandos.close();
-        long tempo_execucao = end - start;
-        System.out.printf("\nTempo de execução: %d milissegundos.\n", tempo_execucao);
     }
 }

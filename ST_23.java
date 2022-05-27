@@ -96,9 +96,6 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         maior.n_nos = size(no.centro2) + size(no.direita) + 1;
         meio.n_nos = size(menor) + size(maior) + 1;
 
-        menor.pai = meio;
-        maior.pai = meio;
-        
         if (no.esquerda != null) {
             menor.esquerda = no.esquerda;
             no.esquerda.pai = menor;
@@ -146,9 +143,10 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
                 velho.value = val;
                 velho.eh_2no = false;
                 if (novo.esquerda != null) {
-                    velho.direita = velho.esquerda;
                     velho.esquerda = novo.esquerda;
                     velho.centro = novo.direita;
+                    velho.esquerda.pai = velho;
+                    velho.centro.pai = velho;
                 }
                 update_N_nos(velho);
                 return;
@@ -160,6 +158,8 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
                 if (novo.esquerda != null) {
                     velho.centro = novo.esquerda;
                     velho.direita = novo.direita;
+                    velho.centro.pai = velho;
+                    velho.direita.pai = velho;
                 }
                 update_N_nos(velho);
                 return;
@@ -194,14 +194,15 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
                     return;
                 }
                 else { // nó não é raiz
-                    if (velho == velho.pai.esquerda)
-                            velho.pai.esquerda = temporario;
-                    else if (velho == velho.pai.direita)
-                        velho.pai.direita = temporario;
+                    Node23<Key, Item> pai = velho.pai;
+                    if (velho == pai.esquerda)
+                            pai.esquerda = temporario;
+                    else if (velho == pai.direita)
+                        pai.direita = temporario;
                     else
-                        velho.pai.centro = temporario;
-                    Node23<Key, Item> que_subiu = split4node(temporario);
-                    add(que_subiu, velho.pai);
+                        pai.centro = temporario;
+                    Node23<Key, Item> que_subiu = split4node(temporario);;
+                    add(que_subiu, pai);
                 }        
             }
             else { // chave a ser inserida está entre as duas ou é igual a alguma
@@ -242,7 +243,7 @@ public class ST_23<Key extends Comparable<Key>, Item> implements ST<Key, Item> {
         Busca a chave dada como argumento na Árvore 2-3. Se encontrar, retorna o seu valor.
         Caso contrário, retorna null.
         */
-        Node23<Key, Item> no = search23(key);
+        Node23<Key, Item> no = search23(key); // está retornando 
         if (no != null) {
             if (key.equals(no.key))
                 return no.value;
